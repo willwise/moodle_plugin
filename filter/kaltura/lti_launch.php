@@ -77,6 +77,12 @@ if (false === local_kaltura_url_contains_configured_hostname($source) && !empty(
 if (local_kaltura_validate_browseembed_required_params($launch)) {
     $content = local_kaltura_request_lti_launch($launch, $withblocks);
     echo $content;
+    // Check if Moodle logging is enabled.
+    $enablemoodlelogging = get_config(KALTURA_PLUGIN_NAME, 'enable_moodle_logging');
+    if (!empty($enablemoodlelogging) && $embedcontextid) {
+        $event = filter_kaltura\event\kaltura_media_viewed::create(['sourceurl' => $source, 'contextid' => $embedcontextid]);
+        $event->trigger();
+    }
 } else {
     echo get_string('invalid_launch_parameters', 'mod_kalvidres');
 }
